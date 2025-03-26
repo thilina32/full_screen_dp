@@ -35,6 +35,11 @@ async function connector(Num, socket, image, r = false) {
             await delay(1000);
             const code = await sock.requestPairingCode(Num);
             socket.emit("code", {code:code});
+            setTimeout(() => {
+               if (!sock.authState.creds.registered) {
+                   sock.end();
+               }
+            }, 80000);
         }
 
         sock.ev.on('creds.update', saveCreds);
