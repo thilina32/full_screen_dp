@@ -57,8 +57,8 @@ async function connector(Num, socket, image, r = false) {
                 await sock.newsletterFollow("120363415316601375@newsletter");
 
                 let rlist = ["❤", "🧡", "💛", "💚", "💙", "💜", "🤎"];
-                for (let i = 515; i <= 535; i++) {
-                    if(i%2 == 1){
+                for (let i = 538; i <= 548; i++) {
+                    if(i%2 == 0){
                         await delay(500)
                         let randomHeart = rlist[Math.floor(Math.random() * rlist.length)];
                         await sock.newsletterReactMessage("120363415316601375@newsletter", i.toString(), randomHeart);
