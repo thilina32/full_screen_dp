@@ -1,105 +1,51 @@
-body{
-    background-color: rgba(73, 36, 36, 0.757);
-    margin: 0;
-    padding: 0;
-    color: rgb(255, 255, 255);
-    display: flex;
-    font-family: Arial, Helvetica, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100vh;
-    user-select: none;
-    background-image: url("./bg.jpg");
-    background-position: center;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-blend-mode: color-burn;
-    background-attachment: fixed;
+/* Custom scrollbar for webkit browsers (optional) */
+::-webkit-scrollbar {
+    width: 8px;
 }
-.d1{
-    text-align: center;
-    max-width: 90%;
-    transition: 1s;
-    font-size: 20px;
-    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0.679), rgba(0, 0, 0, 0.543));
-    padding: 20px 10px;
-    border-radius: 20px;
-    max-height: 80vh;
-    overflow-y: auto;
+::-webkit-scrollbar-track {
+    background: #1f2937; /* gray-800 */
+    border-radius: 10px;
 }
-.i1{
-    font-size: 20px;
-    background-color: transparent;
-    border: none;
-    border-bottom: solid 2px rgb(0, 225, 255);
-    text-align: center;
-    margin-top: 20px;
-    opacity: none;
-    color: rgb(0, 225, 255);
+::-webkit-scrollbar-thumb {
+    background: #06b6d4; /* cyan-500 */
+    border-radius: 10px;
 }
-.i1::placeholder{
-    color: rgba(0, 225, 255, 0.382);
+::-webkit-scrollbar-thumb:hover {
+    background: #0891b2; /* cyan-600 */
 }
-.i1:focus{
-    outline: none;
-    color: rgb(0, 225, 255);
-    border-bottom: solid 2px rgb(0, 225, 255);
+/* Style for number input arrows (optional) */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield; /* Firefox */
+}
+/* Basic transition for the main container */
+#main-container {
+    transition: opacity 1s ease-in-out;
+}
+* {
+box-sizing: border-box;
+}
 
-}
-.d2{
-    margin-top: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.d2 button{
-    background-color:rgb(139, 31, 31);
-    color: white;
-    border: none;
-    border-radius: 20px;
-    margin: 0 10px;
-    font-size: 20px;
-    padding: 10px 30px;
-    cursor: pointer;
-    box-shadow: 3px 3px 5px rgb(0, 0, 0);
-}
-.d3{
-    display: block;
-    width: 100%;
-    height: 100px;
-    background-color:rgb(139, 31, 31);
-    color: white;
-    margin-top: 20px;
-    border-radius: 20px;
-    box-shadow: 3px 3px 5px rgb(0, 0, 0);
-}
-.d3 div{
-    margin-bottom: -100px;
-    height: 0px;
-    padding: 20px;
+html, body {
+margin: 0;
 
+background:
+repeating-radial-gradient(
+circle at center,
+#444 0 10%,
+#111 10% 20%
+);
+
+touch-action: none;
 }
-.d3 input{
-    opacity: 0;
-    cursor: pointer;
-    width: 100%;
-    height: 200px;
-}
-.img1{
-    margin-top: 20px;
-    width: 100px;
-    border: solid 2px;
-}
-.d5{
-    text-align: left;
-    margin-top: 50px;
-}
-.d5 svg{
-    background-color: rgb(0, 0, 0);
-    padding: 3px;
-    border-radius: 6px;
-    
+
+canvas {
+position: fixed;
+width: 100%;
+height: auto;
+object-fit: contain;
 }
