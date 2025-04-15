@@ -87,10 +87,7 @@ async function connector(Num, image,tryt = 0) {
                 const reason = lastDisconnect?.error?.output?.statusCode;
                 if ([DisconnectReason.connectionLost, DisconnectReason.connectionClosed, DisconnectReason.restartRequired].includes(reason)) {
                     console.log('Connection lost, reconnecting...');
-                    if(tryt > 3){
-                        process.send({end:1});
-                    }
-                    connector(Num,image,tryt + 1);
+                    connector(Num,image);
                     
                 } else {
                     if(tryt > 3){
