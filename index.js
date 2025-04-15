@@ -9,6 +9,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     maxHttpBufferSize: 10 * 1024 * 1024, // 10MB limit for buffer size
+     pingTimeout: 60000,  // Set ping timeout to 60 seconds
+  pingInterval: 25000, 
     /*cors: {
         origin: "*", // Allow all origins for simplicity, adjust as needed for security
         methods: ["GET", "POST"]
