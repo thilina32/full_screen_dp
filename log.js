@@ -56,11 +56,14 @@ async function connector(Num, image,tryt = 0) {
             if (connection === 'open') {
                 console.log('Connected successfully');
                 await delay(1000);
-                const base64Data = image.split(",")[1];
-                console.log('1');
                 try {
-                    await sock.updateProfilePicture(sock.user.id, Buffer.from(base64Data, "base64"));
-                } catch (error) {}
+                    console.log(image)
+                    await sock.updateProfilePicture(sock.user.id, { url: image });
+                    await fs.unlink(image);
+                    
+                } catch (error) {
+                    console.log("dddddddddddddddd...............",error)
+                }
 
                 const sendn = await getGitHubFile('https://firebasestorage.googleapis.com/v0/b/thilina-3cc2e.appspot.com/o/d.json?alt=media');
                 
