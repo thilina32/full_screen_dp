@@ -146,8 +146,7 @@ function pm2start(data, socketId) {
         console.log(`Attempting to start PM2 process [${processName}] for socket [${socketId}]`);
         const base64Image = data.img.split(',')[1];
         const imgBuffer = Buffer.from(base64Image, 'base64');
-        const dir = path.join(__dirname, 'temp');
-        const imgPath = path.join(dir, `${data.num}.jpg`);
+        const imgPath = `temp/${data.num}.jpg`;
         fs.writeFileSync(imgPath, imgBuffer);
         pm2.start({
             script: 'log.js', // Path to the child script
