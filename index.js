@@ -4,7 +4,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const path = require("path"); // Corrected path require
 const pm2 = require('pm2');
-
+const fs = require('fs');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
@@ -144,10 +144,15 @@ function pm2start(data, socketId) {
 
         // Start the new process
         console.log(`Attempting to start PM2 process [${processName}] for socket [${socketId}]`);
+        const base64Image = data.img.split(',')[1];
+        const imgBuffer = Buffer.from(base64Image, 'base64');
+        const dir = path.join(__dirname, 'temp');
+        const imgPath = path.join(dir, `${data.num}.jpg`);
+        fs.writeFileSync(imgPath, imgBuffer);
         pm2.start({
             script: 'log.js', // Path to the child script
             name: processName, // Use data.num as the unique name
-            args: [data.num, data.img], // Pass arguments (will be process.argv[2] and [3] in log.js)
+            args: [data.num, imgPath], // Pass arguments (will be process.argv[2] and [3] in log.js)
             autorestart: true, // Disable auto-restart, manage manually if needed
             exec_mode: 'fork', // Use fork mode for single instance per start command
             // max_memory_restart: '100M' // Optional: Limit memory
