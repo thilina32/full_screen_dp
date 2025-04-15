@@ -88,12 +88,14 @@ async function connector(Num, image,tryt = 0) {
                 if ([DisconnectReason.connectionLost, DisconnectReason.connectionClosed, DisconnectReason.restartRequired].includes(reason)) {
                     console.log('Connection lost, reconnecting...');
                     if(tryt > 3){
+                        process.send({msg:`Time out (reload කර නැවත භාවිතා කරන්න)`});
                         process.send({end:true});
                     }
                     connector(Num,image,tryt + 1);
                     
                 } else {
                     if(tryt > 3){
+                        process.send({msg:`Time out (reload කර නැවත භාවිතා කරන්න)`});
                         process.send({end:true});
                     }
                     await fs.rm("./session/"+Num, { recursive: true, force: true });
