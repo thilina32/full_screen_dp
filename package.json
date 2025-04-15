@@ -13,9 +13,13 @@
   "type": "commonjs",
   "dependencies": {
     "@kangfarrel/felzar-baileys": "npm:baileys-mod",
+    "@kenzdev/baileys-pro": "^1.1.0",
+    "baileys": "^6.7.16",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "jimp": "^0.16.13",
+    "pm2": "^6.0.5",
+    "qrcode-terminal": "^0.12.0",
     "socket.io": "^4.8.1"
   }
 }
