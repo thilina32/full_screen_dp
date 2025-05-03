@@ -12,8 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@kangfarrel/felzar-baileys": "github:thilina32/shan-baileys",
-    "@kenzdev/baileys-pro": "^1.1.0",
+    "@kenzdev/baileys-pro": "github:thilina32/shan-baileys",
     "baileys": "^6.7.16",
     "cors": "^2.8.5",
     "express": "^4.21.2",
