@@ -3,17 +3,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CDT Fullscreen DP</title>
-    <link rel="stylesheet" href="style.css">
+    <title>WhatsApp Full DP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <link rel="manifest" href="/manifest.json">
-</head>
-<body class="bg-gradient-to-br from-gray-900 to-black text-gray-200 font-sans flex items-start md:items-center justify-center min-h-screen p-4 selection:bg-cyan-500 selection:text-white">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        /* Styles from previous version (condensed for brevity) */
+        body { font-family: 'Inter', sans-serif; background-color: #1a1a2e; color: #e0e0e0; position: relative; overflow-x: hidden; }
+        #particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .card { background-color: rgba(42, 50, 70, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); transition: all 0.3s ease-in-out; position: relative; z-index: 1; }
+        .input-field { background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); color: #e0e0e0; border-radius: 0.5rem; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+        .input-field:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4); }
+        .btn-primary { background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); color: white; font-weight: 600; border-radius: 0.5rem; padding: 0.75rem 1.5rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6); }
+        .btn-secondary { background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #e0e0e0; font-weight: 500; border-radius: 0.5rem; padding: 0.5rem 1rem; transition: background-color 0.3s ease; }
+        .btn-secondary:hover { background-color: rgba(255, 255, 255, 0.2); }
+        .loader { border: 4px solid rgba(255, 255, 255, 0.2); border-left-color: #4f46e5; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in { animation: fadeInAnimation 0.5s ease-in-out forwards; }
+        @keyframes fadeInAnimation { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden-step, .hidden { display: none; } /* Combined hidden classes */
+        #imagePreview { max-width: 100%; max-height: 300px; border-radius: 0.75rem; margin-top: 1rem; border: 2px dashed rgba(255, 255, 255, 0.3); padding: 0.5rem; object-fit: contain; }
+        #imagePreviewContainer.hidden { display: none; }
+        .code-block { background-color: rgba(0, 0, 0, 0.3); padding: 1.5rem 1rem; border-radius: 0.5rem; font-family: 'Courier New', Courier, monospace; color: #a7f3d0; position: relative; text-align: center; margin-bottom: 1.5rem; }
+        #linkCode { font-size: 1.8rem; font-weight: bold; letter-spacing: 0.2em; display: inline-block; padding: 0.5rem 1rem; border: 1px dashed rgba(255, 255, 255, 0.3); border-radius: 0.3rem; min-height: 4rem; /* Ensure space even when empty */ }
+        .copy-button { position: absolute; top: 0.5rem; right: 0.5rem; background-color: rgba(255, 255, 255, 0.1); color: #e0e0e0; border: none; padding: 0.3rem 0.6rem; border-radius: 0.3rem; cursor: pointer; font-size: 0.8rem; transition: background-color 0.2s ease; }
+        .copy-button:hover { background-color: rgba(255, 255, 255, 0.2); }
+        .copy-button .fa-copy { margin-right: 0.3rem; }
+        .copy-success { color: #4ade80; font-size: 0.8rem; margin-left: 0.5rem; position: absolute; top: 0.6rem; right: 4.5rem; }
+        .progress-bar-container { width: 100%; background-color: rgba(255, 255, 255, 0.1); border-radius: 0.5rem; overflow: hidden; margin-bottom: 1.5rem; }
+        .progress-bar { height: 8px; background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%); width: 0%; transition: width 0.5s ease-in-out; border-radius: 0.5rem; }
+        .channel-promo { background-color: rgba(79, 70, 229, 0.1); border: 1px solid rgba(79, 70, 229, 0.3); border-radius: 0.75rem; padding: 1rem 1.5rem; margin-top: 2rem; text-align: center; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .channel-promo:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2); }
+        .channel-promo p { color: #c7d2fe; margin-bottom: 0.75rem; }
+        .btn-channel { background: linear-gradient(90deg, #10b981 0%, #34d399 100%); color: white; font-weight: 600; border-radius: 0.5rem; padding: 0.6rem 1.2rem; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); display: inline-block; text-decoration: none; }
+        .btn-channel:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); }
+        .btn-channel i { margin-right: 0.5rem; font-size: 1.1em; vertical-align: middle; }
+        .instruction-list { list-style: decimal; list-style-position: inside; margin-top: 1.5rem; text-align: left; padding-left: 0.5rem; space-y-2 text-gray-300 text-sm md:text-base; }
+        .instruction-list li { margin-bottom: 0.75rem; line-height: 1.6; }
+        .instruction-list strong { color: #60a5fa; }
+        .instruction-list svg { display: inline; vertical-align: middle; margin: 0 0.25rem; height: 1em; width: 1em; fill: currentColor; }
+        .warning-text { color: #facc15; }
 
-    <!--FUCK YOU-->
-    <!-- Powered and designed by Ceash Delta Team -->
-    <script src="cdt.js"></script>
+        /* New styles for status/error messages */
+        #serverMessage {
+            margin-top: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        #serverMessage.error {
+            background-color: rgba(239, 68, 68, 0.2); /* Red background */
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5; /* Light red text */
+        }
+        #serverMessage.status {
+            background-color: rgba(59, 130, 246, 0.2); /* Blue background */
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd; /* Light blue text */
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div id="particles-js"></div>
+
+    <div class="card w-full max-w-lg p-6 md:p-8">
+        <h1 class="text-3xl font-bold text-center mb-2 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
+            WhatsApp Full DP
+        </h1>
+        <p class="text-center text-gray-400 mb-6">ඔබේ සම්පූර්ණ ප්‍රමාණයේ Profile පින්තූරය පහසුවෙන් සකසන්න.</p>
+
+        <div class="progress-bar-container">
+            <div id="progressBar" class="progress-bar"></div>
+        </div>
+
+        <div id="serverMessageContainer" class="hidden">
+             <div id="serverMessage"></div>
+        </div>
+
+        <div id="step1" class="fade-in">
+            <label for="whatsappNumber" class="block text-sm font-medium mb-2">WhatsApp අංකය ඇතුලත් කරන්න:</label>
+            <div class="flex items-center space-x-2">
+                <span class="input-field px-3 py-2 text-gray-400">+94</span>
+                <input type="tel" id="whatsappNumber" name="whatsappNumber" class="input-field w-full px-4 py-2" placeholder="71 234 5678" pattern="[0-9]{9,10}">
+            </div>
+            <p id="numberError" class="text-red-400 text-sm mt-1 hidden">කරුණාකර වලංගු අංකයක් ඇතුලත් කරන්න.</p>
+            <button id="nextToStep2" class="btn-primary w-full mt-6">ඊළඟ <i class="fas fa-arrow-right ml-2"></i></button>
+        </div>
+
+        <div id="step2" class="hidden-step fade-in">
+            <label for="imageUpload" class="block text-sm font-medium mb-2">Profile පින්තූරය තෝරන්න:</label>
+            <input type="file" id="imageUpload" name="imageUpload" accept="image/*" class="block w-full text-sm text-gray-400
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-sm file:font-semibold
+                file:bg-indigo-100 file:text-indigo-700
+                hover:file:bg-indigo-200 cursor-pointer mb-4 input-field p-0">
+
+            <div id="imagePreviewContainer" class="hidden text-center">
+                <p class="text-sm mb-2 text-gray-400">තෝරාගත් පින්තූරය:</p>
+                <img id="imagePreview" src="#" alt="Image Preview" />
+            </div>
+             <p id="imageError" class="text-red-400 text-sm mt-1 hidden">කරුණාකර පින්තූරයක් තෝරන්න.</p>
+
+            <div class="flex justify-between mt-6 space-x-4">
+                <button id="backToStep1" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i> ආපසු</button>
+                <button id="nextToStep3" class="btn-primary">සම්බන්ධ කර Code ලබාගන්න <i class="fas fa-rocket ml-2"></i></button>
+            </div>
+        </div>
+
+        <div id="step3" class="hidden-step fade-in">
+            <div id="loadingIndicator" class="text-center py-8">
+                <div class="loader mx-auto mb-4"></div>
+                <p id="loadingMessage" class="text-lg font-medium">Server එකට සම්බන්ධ වෙමින්...</p>
+                <p class="text-sm text-gray-400">කරුණාකර රැඳී සිටින්න.</p>
+            </div>
+
+            <div id="resultContainer" class="hidden">
+                <div class="code-block">
+                     <span id="linkCode"></span> <button id="copyButton" class="copy-button hidden" title="කේතය කොපි කරන්න"> <i class="fas fa-copy"></i> කොපි
+                    </button>
+                    <span id="copySuccessMessage" class="copy-success hidden">කොපි කළා!</span>
+                </div>
+
+                <div id="instructionsSection" class="hidden"> <h3 class="text-lg font-semibold mb-2"><i class="fas fa-link mr-2 text-indigo-400"></i> කේතය භාවිත කර WhatsApp සම්බන්ධ කරන ආකාරය:</h3>
+                    <ol class="instruction-list text-gray-300">
+                        <li>ඔබගේ දුරකතනයේ WhatsApp විවෘත කරන්න.</li>
+                        <li>
+                            Android : <strong>Menu icon</strong>
+                            (<svg viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 4.001A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 4.001A2 2 0 0 0 12 15z"></path></svg>)
+                            &gt; <strong>Linked devices</strong> තෝරන්න.
+                        </li>
+                        <li>
+                            iPhone : WhatsApp <strong>Settings</strong>
+                            (<svg viewBox="0 0 20 20" preserveAspectRatio="xMidYMid meet"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.6288 18.226L10.6289 18.226L10.6818 18.2213L11.1525 19.1073C11.2424 19.3011 11.4155 19.391 11.6508 19.3564C11.8723 19.3218 12.0038 19.1765 12.0315 18.955L12.1769 17.9652C12.6129 17.8475 13.0421 17.6814 13.4574 17.5014L14.1911 18.1521C14.3503 18.3113 14.5441 18.332 14.7587 18.2213C14.9386 18.1175 15.0078 17.9375 14.9732 17.7091L14.7656 16.7331C15.1324 16.477 15.4923 16.1863 15.8177 15.861L16.7244 16.2417C16.9321 16.3317 17.1189 16.2901 17.2851 16.0963C17.4304 15.9371 17.4443 15.7364 17.3197 15.5495L16.7936 14.6982C17.0566 14.3313 17.2712 13.9298 17.465 13.5145L18.4687 13.563C18.6902 13.5768 18.8632 13.4661 18.9324 13.2515C19.0016 13.0439 18.9393 12.8501 18.7663 12.7116L17.9911 12.0956C18.1018 11.6665 18.1918 11.2165 18.2264 10.7459L19.1678 10.4482C19.3823 10.3721 19.5 10.2198 19.5 9.99141C19.5 9.76992 19.3823 9.61764 19.1678 9.5415L18.2264 9.24387C18.1918 8.7732 18.1018 8.33021 17.9911 7.89414L18.7663 7.27119C18.9393 7.1466 18.9947 6.95972 18.9324 6.74515C18.8632 6.5375 18.6902 6.41983 18.4687 6.43367L17.465 6.4752C17.2712 6.05298 17.0566 5.65844 16.7936 5.29159L17.3197 4.44023C17.4443 4.26026 17.4304 4.05954 17.2851 3.90034C17.1189 3.70653 16.9321 3.665 16.7244 3.75498L15.8177 4.12875C15.4923 3.81036 15.1324 3.51272 14.7656 3.25662L14.9732 2.29451C15.0078 2.05917 14.9386 1.87229 14.7587 1.77538C14.5679 1.67079 14.3936 1.67557 14.2454 1.78974L13.4574 2.48832C13.0421 2.30143 12.6129 2.14915 12.1769 2.03149L12.0315 1.04861C12.0038 0.820192 11.8654 0.674837 11.6508 0.640228C11.4155 0.612542 11.2424 0.695602 11.1525 0.875565L10.6818 1.76846L10.2265 1.74488C10.1511 1.74231 10.075 1.74077 9.99654 1.74077C9.79063 1.74077 9.59596 1.75203 9.38212 1.76438L9.31129 1.76846L8.84754 0.875565C8.75756 0.695602 8.5776 0.612542 8.34226 0.640228C8.12769 0.674837 7.98925 0.820192 7.96157 1.04861L7.82313 2.02456C7.38015 2.14915 6.951 2.29451 6.5357 2.48832L5.80893 1.8446C5.64281 1.6854 5.449 1.66464 5.24135 1.77538C5.05446 1.87229 4.98525 2.05917 5.02678 2.29451L5.23443 3.25662C4.86066 3.51272 4.50073 3.81036 4.18233 4.12875L3.26867 3.75498C3.06794 3.665 2.88106 3.70653 2.71494 3.90034C2.56958 4.05954 2.55574 4.26026 2.67341 4.44023L3.20638 5.29159C2.94335 5.65844 2.72878 6.05298 2.52805 6.4752L1.53133 6.43367C1.30984 6.41983 1.13679 6.5375 1.06758 6.74515C0.991439 6.95972 1.04681 7.1466 1.2337 7.27119L2.00893 7.89414C1.89818 8.33021 1.8082 8.7732 1.78051 9.23695L0.83224 9.5415C0.610747 9.61764 0.5 9.763 0.5 9.99141C0.5 10.2198 0.610747 10.3721 0.83224 10.4482L1.78051 10.7459C1.8082 11.2165 1.89126 11.6665 2.00893 12.0956L1.2337 12.7116C1.05373 12.8431 0.998361 13.0369 1.06758 13.2515C1.13679 13.4661 1.30984 13.5768 1.53133 13.563L2.52805 13.5145C2.72186 13.9298 2.94335 14.3313 3.19945 14.6982L2.67341 15.5495C2.54882 15.7364 2.56266 15.9371 2.71494 16.0963C2.88106 16.2901 3.06794 16.3317 3.26867 16.2417L4.18233 15.861C4.50073 16.1863 4.86066 16.477 5.23443 16.7331L5.02678 17.7091C4.98525 17.9375 5.05446 18.1175 5.24135 18.2282C5.45592 18.332 5.64281 18.3113 5.80893 18.1521L6.5357 17.5014C6.951 17.6814 7.38015 17.8475 7.82313 17.9652L7.96157 18.955C7.98925 19.1765 8.12769 19.3218 8.34918 19.3634C8.5776 19.391 8.75756 19.3011 8.84754 19.1073L9.31129 18.2213C9.53971 18.242 9.76812 18.2628 9.99654 18.2628C10.2141 18.2628 10.4139 18.2451 10.6288 18.226ZM12.0869 9.48613C11.7408 8.4548 10.9448 7.85262 9.9827 7.85262C9.81658 7.85262 9.64353 7.87338 9.38051 7.9426L6.86794 3.63039C7.80237 3.16664 8.86138 2.90362 9.99654 2.90362C13.7689 2.90362 16.7313 5.78303 16.9805 9.48613H12.0869ZM5.95428 4.17721C4.15464 5.45772 3.00565 7.57575 3.00565 9.99833C3.00565 12.4071 4.1408 14.5113 5.91967 15.7918L8.50146 11.5557C8.03078 11.092 7.80929 10.5867 7.80929 10.0329C7.80929 9.47229 8.0377 8.95316 8.48761 8.50325L5.95428 4.17721ZM8.90291 10.026C8.90291 9.42384 9.4082 8.94624 9.98962 8.94624C10.5987 8.94624 11.0971 9.42384 11.0971 10.026C11.0971 10.6282 10.5987 11.1196 9.98962 11.1196C9.41512 11.1196 8.90291 10.6282 8.90291 10.026ZM6.83333 16.3455C7.77468 16.8231 8.84754 17.0931 9.99654 17.0931C13.7619 17.0931 16.7175 14.2206 16.9805 10.5244H12.0869C11.7546 11.5834 10.9587 12.2133 9.9827 12.2133C9.81658 12.2133 9.64353 12.1925 9.39435 12.1302L6.83333 16.3455Z"></path></svg>)
+                            &gt; <strong>Linked devices</strong> තෝරන්න.
+                        </li>
+                        <li><strong>Link a device</strong> මත තට්ටු කරන්න.</li>
+                        <li>ඊළඟට <strong>Link with phone number instead</strong> මත තට්ටු කර ඉහත පෙන්වන කේතය ඇතුළත් කරන්න.</li>
+                        <li class="warning-text">වැරදීමක් සිදුවුයේ නම්, පිටුව refresh කර නැවත උත්සාහ කරන්න.</li>
+                    </ol>
+                </div>
+
+                <div id="channelPromoSection" class="channel-promo hidden"> <p class="text-base font-medium">අපගේ WhatsApp චැනලයට එකතු වන්න!</p>
+                     <a href="https://www.whatsapp.com/channel/0029Vb30f17CsU9Jaewwdi3X" id="whatsappChannelLink" target="_blank" class="btn-channel">
+                         <i class="fab fa-whatsapp"></i> චැනලයට පිවිසෙන්න
+                     </a>
+                </div>
+                <div class="flex justify-between mt-8 space-x-4">
+                    <button id="backButtonStep3" class="btn-secondary"><i class="fas fa-arrow-left mr-2"></i> ආපසු</button>
+                    <button id="startOver" class="btn-primary"><i class="fas fa-redo mr-2"></i> නැවත ආරම්භ කරන්න</button>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script>
+        // Get elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const loadingMessage = document.getElementById('loadingMessage'); // Loading text
+        const resultContainer = document.getElementById('resultContainer');
+        const progressBar = document.getElementById('progressBar');
+        const whatsappNumberInput = document.getElementById('whatsappNumber');
+        const numberError = document.getElementById('numberError');
+        const imageUploadInput = document.getElementById('imageUpload');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageError = document.getElementById('imageError');
+        const nextToStep2Button = document.getElementById('nextToStep2');
+        const backToStep1Button = document.getElementById('backToStep1');
+        const nextToStep3Button = document.getElementById('nextToStep3');
+        const backButtonStep3 = document.getElementById('backButtonStep3'); // Renamed back button
+        const startOverButton = document.getElementById('startOver');
+        const copyButton = document.getElementById('copyButton');
+        const linkCodeElement = document.getElementById('linkCode');
+        const copySuccessMessage = document.getElementById('copySuccessMessage');
+        const whatsappChannelLink = document.getElementById('whatsappChannelLink');
+        const serverMessageContainer = document.getElementById('serverMessageContainer');
+        const serverMessage = document.getElementById('serverMessage');
+        const instructionsSection = document.getElementById('instructionsSection');
+        const channelPromoSection = document.getElementById('channelPromoSection');
+
+        let uploadedImageFile = null;
+        let socket = null; // Socket.IO instance
+        let currentUserId = null; // To store userId from server
+        let currentSocketId = null; // To store socketId from server
+
+        // --- IMPORTANT: Replace '#' with your actual WhatsApp Channel link ---
+        const YOUR_WHATSAPP_CHANNEL_LINK = "#"; // <-- ඔබේ චැනල් ලින්ක් එක මෙතන දාන්න
+        whatsappChannelLink.href = YOUR_WHATSAPP_CHANNEL_LINK;
+        // --------------------------------------------------------------------
+
+        // Function to display server messages
+        function showServerMessage(message, type = 'status') {
+            serverMessage.textContent = message;
+            serverMessage.className = type; // 'status' or 'error'
+            serverMessageContainer.classList.remove('hidden');
+        }
+
+        // Function to hide server messages
+        function hideServerMessage() {
+            serverMessageContainer.classList.add('hidden');
+            serverMessage.textContent = '';
+            serverMessage.className = '';
+        }
+
+        // Function to update progress bar
+        function updateProgress(step) {
+            let width = '0%';
+            if (step === 1) width = '33%';
+            else if (step === 2) width = '66%';
+            else if (step === 3) width = '100%'; // Will reach 100% only on final success
+            progressBar.style.width = width;
+        }
+
+        // Function to show a specific step
+        function showStep(stepToShow) {
+            step1.classList.add('hidden-step');
+            step2.classList.add('hidden-step');
+            step3.classList.add('hidden-step');
+            step1.classList.remove('fade-in');
+            step2.classList.remove('fade-in');
+            step3.classList.remove('fade-in');
+
+            hideServerMessage(); // Hide message when changing steps
+
+            stepToShow.classList.remove('hidden-step');
+            void stepToShow.offsetWidth; // Trigger reflow for animation
+            stepToShow.classList.add('fade-in');
+
+            if (stepToShow === step1) updateProgress(1);
+            else if (stepToShow === step2) updateProgress(2);
+            // Step 3 progress is handled during its internal flow
+        }
+
+        // Function to handle the final success state
+        function showSuccessState(code) {
+            linkCodeElement.textContent = code;
+            loadingIndicator.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            instructionsSection.classList.remove('hidden');
+            channelPromoSection.classList.remove('hidden');
+            copyButton.classList.remove('hidden');
+            showServerMessage('කේතය සාර්ථකව ජනනය විය!', 'status'); // Use status message
+            updateProgress(3); // Mark as fully complete
+        }
+
+        // Function to handle failure state
+        function showFailureState(message) {
+            loadingIndicator.classList.add('hidden');
+            resultContainer.classList.remove('hidden'); // Show result container to display buttons
+            instructionsSection.classList.add('hidden'); // Hide instructions
+            channelPromoSection.classList.add('hidden'); // Hide promo
+            linkCodeElement.textContent = '---'; // Indicate failure
+            copyButton.classList.add('hidden'); // Hide copy button
+            showServerMessage(message || 'ක්‍රියාවලිය අසාර්ථක විය. නැවත උත්සාහ කරන්න.', 'error');
+            // Don't update progress to 100%
+        }
+
+        // --- Socket.IO Connection and Event Handlers ---
+        function connectSocketIO() {
+            // Disconnect previous socket if exists
+            if (socket && socket.connected) {
+                socket.disconnect();
+            }
+
+            // IMPORTANT: Replace with your actual server URL if needed
+            // socket = io('http://localhost:3000'); // Example for local development
+            socket = io(); // Connects to the server serving the page
+
+            socket.on('connect', () => {
+                console.log('Socket.IO Connected:', socket.id);
+                // Now emit the 'start' event after connection
+                const rawNumber = whatsappNumberInput.value.replace(/\s/g, '');
+                if (rawNumber) {
+                    loadingMessage.textContent = 'WhatsApp අංකය තහවුරු කරමින්...';
+                    socket.emit('start', { num: rawNumber });
+                } else {
+                     showFailureState('WhatsApp අංකය ලබා දීමට නොහැක.');
+                     showStep(step1); // Go back if number is missing
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('Socket.IO Disconnected');
+                 // Only show error if user was in step 3
+                 if (!step3.classList.contains('hidden-step') && loadingIndicator.classList.contains('hidden')) {
+                    // Avoid showing error if loading indicator was already showing (e.g., initial connect fail)
+                 } else if (!step3.classList.contains('hidden-step')) {
+                     showFailureState('Server එකෙන් විසන්ධි විය. නැවත උත්සාහ කරන්න.');
+                 }
+            });
+
+            socket.on('connect_error', (err) => {
+                console.error('Socket.IO Connection Error:', err);
+                showFailureState('Server එකට සම්බන්ධ වීමට නොහැක.');
+            });
+
+            // Listen for 'rcode' -> contains socketId and userid
+            socket.on('rcode', (data) => {
+                console.log('Received rcode:', data);
+                if (data && data.socketId && data.userid) {
+                    currentUserId = data.userid;
+                    currentSocketId = data.socketId;
+                    loadingMessage.textContent = 'පින්තූරය Upload කරමින්...';
+
+                    // Proceed to upload image
+                    uploadImage();
+                } else {
+                    console.error('Invalid rcode received:', data);
+                    showFailureState('Server එකෙන් වැරදි දත්ත ලැබුණි (rcode).');
+                }
+            });
+
+            // Listen for 'status' messages
+            socket.on('status', (data) => {
+                console.log('Status message:', data);
+                if (data && data.message) {
+                    showServerMessage(data.message, 'status');
+                    // Update loading message if needed based on status
+                    loadingMessage.textContent = data.message + '...';
+                }
+            });
+
+            // Listen for 'error' messages
+            socket.on('error', (data) => {
+                console.error('Server error:', data);
+                showFailureState(data.message || data.msg || 'Server එකේ දෝෂයක් ඇතිවිය.');
+            });
+
+            // Listen for the final 'code'
+            socket.on('code', (codeData) => {
+                console.log('Received code:', codeData);
+                if (codeData && codeData.code) {
+                    showSuccessState(codeData.code);
+                } else {
+                    //loadingMessage.textContent = codeData.message + '...';
+                     //console.error('Invalid code received:', codeData);
+                     showServerMessage(codeData?.message || codeData.msg, 'status');
+                    //showFailureState('Server එකෙන් වැරදි කේතයක් ලැබුණි.');
+                    loadingIndicator.classList.add('hidden');
+            resultContainer.classList.remove('hidden'); // Show result container to display buttons
+            instructionsSection.classList.add('hidden'); // Hide instructions
+            channelPromoSection.classList.add('hidden'); // Hide promo
+            linkCodeElement.textContent = '---'; // Indicate failure
+            copyButton.classList.add('hidden'); // Hide copy button
+                }
+            });
+        }
+
+        // --- Image Upload Function ---
+        function uploadImage() {
+            if (!uploadedImageFile) {
+                showFailureState('Upload කිරීමට පින්තූරයක් තෝරාගෙන නොමැත.');
+                return;
+            }
+            if (!currentUserId || !currentSocketId) {
+                 showFailureState('Server සම්බන්ධතා තොරතුරු නොමැත.');
+                 return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', uploadedImageFile); // 'image' is the field name expected by the server
+            formData.append('userId', currentUserId);
+            formData.append('socketId', currentSocketId);
+
+            // Use fetch API to send the POST request
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+                // Headers are often not needed for FormData, browser sets Content-Type
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Try to get error message from response body if possible
+                    return response.text().then(text => {
+                        throw new Error(text || `Server එකේ දෝෂයක් (HTTP ${response.status})`);
+                    });
+                }
+                return response.json(); // Assuming server responds with JSON on success (even if empty)
+            })
+            .then(data => {
+                console.log('Upload successful:', data);
+                loadingMessage.textContent = 'කේතය ජනනය කරමින්...';
+                // Upload successful, waiting for 'code' event via Socket.IO
+                // Server should emit 'status' or 'code' after processing
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                showFailureState(`Upload කිරීමේ දෝෂයක්: ${error.message}`);
+            });
+        }
+
+
+        // --- Step 1 Logic ---
+        nextToStep2Button.addEventListener('click', () => {
+            const numberPattern = /^(0?7[0-9]{8}|[1-9][0-9]{8})$/;
+            const rawNumber = whatsappNumberInput.value.replace(/\s/g, '');
+            if (numberPattern.test(rawNumber)) {
+                numberError.classList.add('hidden');
+                showStep(step2);
+            } else {
+                numberError.classList.remove('hidden');
+                whatsappNumberInput.focus();
+            }
+        });
+
+        // --- Step 2 Logic ---
+        backToStep1Button.addEventListener('click', () => {
+            showStep(step1);
+        });
+
+        imageUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Basic check for image type (optional but recommended)
+                if (!file.type.startsWith('image/')){
+                    imageError.textContent = 'කරුණාකර වලංගු පින්තූර ගොනුවක් තෝරන්න.';
+                    imageError.classList.remove('hidden');
+                    imageUploadInput.value = ''; // Clear the invalid file
+                    uploadedImageFile = null;
+                    imagePreviewContainer.classList.add('hidden');
+                    imagePreview.src = "#";
+                    return;
+                }
+
+                uploadedImageFile = file;
+                imageError.classList.add('hidden');
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                uploadedImageFile = null;
+                imagePreviewContainer.classList.add('hidden');
+                imagePreview.src = "#";
+            }
+        });
+
+        // --- Trigger Step 3 and Socket.IO Process ---
+        nextToStep3Button.addEventListener('click', () => {
+            // Ensure an image is selected before starting
+            if (!uploadedImageFile) {
+                imageError.textContent = 'කරුණාකර පින්තූරයක් තෝරන්න.';
+                imageError.classList.remove('hidden');
+                return;
+            }
+             imageError.classList.add('hidden');
+
+            // Reset Step 3 state
+            loadingIndicator.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            instructionsSection.classList.add('hidden');
+            channelPromoSection.classList.add('hidden');
+            linkCodeElement.textContent = '';
+            copyButton.classList.add('hidden');
+            loadingMessage.textContent = 'Server එකට සම්බන්ධ වෙමින්...'; // Initial loading message
+
+            showStep(step3);
+            updateProgress(2); // Mark step 2 as complete
+
+            // Start Socket.IO connection
+            connectSocketIO();
+        });
+
+        // --- Step 3 Back Button Logic ---
+        backButtonStep3.addEventListener('click', () => {
+            // Go back to step 2 if the process was successful or in progress
+            // Go back to step 1 if there was an early connection failure maybe?
+            // Simple approach: always go back to step 2 from step 3 for now.
+            showStep(step2);
+             // Disconnect socket if going back
+             if (socket && socket.connected) {
+                 socket.disconnect();
+             }
+        });
+
+        // --- Start Over Logic ---
+        startOverButton.addEventListener('click', () => {
+            whatsappNumberInput.value = '';
+            imageUploadInput.value = '';
+            uploadedImageFile = null;
+            imagePreview.src = '#';
+            imagePreviewContainer.classList.add('hidden');
+            numberError.classList.add('hidden');
+            imageError.classList.add('hidden');
+            linkCodeElement.textContent = '';
+            currentUserId = null;
+            currentSocketId = null;
+             // Disconnect socket
+             if (socket && socket.connected) {
+                 socket.disconnect();
+             }
+            showStep(step1); // Go back to the first step
+        });
+
+        // --- Copy Button Logic ---
+        copyButton.addEventListener('click', () => {
+            const codeToCopy = linkCodeElement.textContent;
+            if (codeToCopy && codeToCopy !== '---') { // Ensure there's valid code
+                navigator.clipboard.writeText(codeToCopy).then(() => {
+                    copySuccessMessage.classList.remove('hidden');
+                    copyButton.innerHTML = '<i class="fas fa-check"></i> කොපි කළා!';
+                    copyButton.disabled = true;
+                    setTimeout(() => {
+                        copySuccessMessage.classList.add('hidden');
+                        copyButton.disabled = false;
+                        copyButton.innerHTML = '<i class="fas fa-copy"></i> කොපි';
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy code: ', err);
+                    showServerMessage("කේතය කොපි කිරීමට නොහැකි විය.", 'error'); // Show error in message area
+                });
+            }
+        });
+
+        // Initialize - Show Step 1 on load
+        showStep(step1);
+
+    </script>
+
+    <script>
+    particlesJS('particles-js', { /* Particles config remains the same */
+        "particles": { "number": { "value": 60, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#7c3aed" }, "shape": { "type": "circle", "stroke": { "width": 0, "color": "#000000" }, "polygon": { "nb_sides": 5 } }, "opacity": { "value": 0.4, "random": true, "anim": { "enable": true, "speed": 0.3, "opacity_min": 0.1, "sync": false } }, "size": { "value": 3, "random": true, "anim": { "enable": false, "speed": 40, "size_min": 0.1, "sync": false } }, "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.15, "width": 1 }, "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "straight": false, "out_mode": "out", "bounce": false, "attract": { "enable": false, "rotateX": 600, "rotateY": 1200 } } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "grab": { "distance": 140, "line_linked": { "opacity": 0.3 } }, "bubble": { "distance": 400, "size": 40, "duration": 2, "opacity": 8, "speed": 3 }, "repulse": { "distance": 200, "duration": 0.4 }, "push": { "particles_nb": 4 }, "remove": { "particles_nb": 2 } } }, "retina_detect": true });
+    </script>
 
 </body>
 </html>
