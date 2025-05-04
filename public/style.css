@@ -1,51 +1,194 @@
-/* Custom scrollbar for webkit browsers (optional) */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #1f2937; /* gray-800 */
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb {
-    background: #06b6d4; /* cyan-500 */
-    border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #0891b2; /* cyan-600 */
-}
-/* Style for number input arrows (optional) */
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield; /* Firefox */
-}
-/* Basic transition for the main container */
-#main-container {
-    transition: opacity 1s ease-in-out;
-}
-* {
-box-sizing: border-box;
+/* Custom dark theme adjustments */
+body {
+    font-family: 'Inter', sans-serif;
+    /* Removed direct background gradient from body */
+    background-color: #1a1a2e; /* Fallback background color */
+    color: #e0e0e0;
+    position: relative; /* Needed for absolute positioning of particles */
+    overflow-x: hidden; /* Prevent horizontal scrollbar caused by particles */
 }
 
-html, body {
-margin: 0;
-
-background:
-repeating-radial-gradient(
-circle at center,
-#444 0 10%,
-#111 10% 20%
-);
-
-touch-action: none;
+/* Particles.js Container Styling */
+#particles-js {
+    position: fixed; /* Use fixed to cover viewport even when scrolling */
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Place behind all other content */
+    /* Optional: Add the gradient here if you want it behind particles */
+     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 }
 
-canvas {
-position: fixed;
-width: 100%;
-height: auto;
-object-fit: contain;
+.card {
+    background-color: rgba(42, 50, 70, 0.85); /* Slightly increased opacity */
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
+    position: relative; /* Ensure card stays above particles */
+    z-index: 1; /* Explicitly set z-index */
+}
+.input-field {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.input-field:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.4);
+}
+.btn-primary {
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+}
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e0e0e0;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s ease;
+}
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+/* Loading Spinner Animation */
+.loader {
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-left-color: #4f46e5;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+/* Fade-in animation */
+.fade-in {
+    animation: fadeInAnimation 0.5s ease-in-out forwards;
+}
+@keyframes fadeInAnimation {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* Hide elements initially */
+.hidden-step {
+    display: none;
+}
+/* Image Preview Styling */
+#imagePreview {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    padding: 0.5rem;
+    object-fit: contain;
+}
+#imagePreviewContainer.hidden {
+    display: none;
+}
+/* Code Block Styling */
+.code-block {
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-family: 'Courier New', Courier, monospace;
+    color: #a7f3d0;
+    position: relative;
+    overflow-x: auto;
+}
+.copy-button {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e0e0e0;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: background-color 0.2s ease;
+}
+.copy-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+.copy-button .fa-copy {
+    margin-right: 0.3rem;
+}
+.copy-success {
+    color: #4ade80;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+/* Progress Bar */
+.progress-bar-container {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+.progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+    width: 0%;
+    transition: width 0.5s ease-in-out;
+    border-radius: 0.5rem;
+}
+/* Channel Promo Styling */
+.channel-promo {
+    background-color: rgba(79, 70, 229, 0.1);
+    border: 1px solid rgba(79, 70, 229, 0.3);
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    margin-top: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.channel-promo:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
+}
+.channel-promo p {
+    color: #c7d2fe;
+    margin-bottom: 0.75rem;
+}
+.btn-channel {
+    background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    display: inline-block;
+    text-decoration: none;
+}
+.btn-channel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+}
+.btn-channel i {
+    margin-right: 0.5rem;
+    font-size: 1.1em;
+    vertical-align: middle;
 }
