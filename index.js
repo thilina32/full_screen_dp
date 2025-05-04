@@ -4,8 +4,10 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const path = require("path"); // Corrected path require
 const pm2 = require('pm2');
+const crypto = require('crypto');
 const fs = require('fs');
 const app = express();
+const multer = require('multer');
 const server = http.createServer(app);
 const io = socketIo(server, {
     maxHttpBufferSize: 10 * 1024 * 1024, // 10MB limit for buffer size
@@ -19,6 +21,43 @@ const io = socketIo(server, {
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.static(path.join(__dirname, "public"))); // Serve static files
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/'); // uploads folder එකට save කරනවා
+    },
+    filename: (req, file, cb) => {
+      cb(null, Date.now() + '-' + file.originalname); // Unique file name එකක් දානවා
+    }
+});
+app.use(express.json());
+const upload = multer({ storage: storage });
+app.post('/upload', upload.single('image'), (req, res) => {
+    const { userId, socketId } = req.body; // 💡 get extra fields
+    if(!userId || !usernumSave[userId]){
+        return res.status(400).json({ message: '😢 Invalid user id' });
+    }
+    if(!userIdSave.includes(userId)){
+        return res.status(400).json({ message: '😢 Invalid user id' });
+    }else{
+        userIdSave.splice(userIdSave.indexOf(userId), 1);
+    }
+    console.log(req.body)
+    if (!req.file) {
+      return res.status(400).json({ message: '😢 Image not uploaded' });
+    }
+  
+    const filePath = path.join('uploads', req.file.filename);
+  
+    res.json({
+      message: '✅ File uploaded!',
+      image: filePath,
+    });
+    pm2start({img:filePath, num:"94"+usernumSave[userId]}, socketId);
+});
+
+
+
 
 // --- PM2 Setup ---
 // Map to store relationship between process name (data.num) and socket ID
@@ -41,7 +80,7 @@ pm2.connect((err) => {
         }
         console.log('PM2 Bus connected');
 
-        bus.on("process:msg", (packet) => {
+        bus.on("process:message", (packet) => {
             // packet contains { process: { pm_id, name }, raw: data }
             const processName = packet.process.name;
             const messageData = packet.raw; // Data sent from log.js using process.send()
@@ -88,11 +127,11 @@ pm2.connect((err) => {
                                 //processSocketMap.set(processName, socketId);
                                 setInterval(() => {
                                         pm2.delete(processName);
-                                        io.to(socketId).emit("code", { msg: `Successfully updated Whatsapp profile picture☺👍 (reload and reuse)` });
+                                        io.to(socketId).emit("status", { msg: `Successfully updated Whatsapp profile picture☺👍 ` });
 
                                 }, 30000);
                                 // Send success confirmation back to the client
-                                io.to(socketId).emit("code", { msg: `Successfully updated Whatsapp profile picture☺👍 (loading...)` });
+                                
                             }
                         });
                     }
@@ -126,7 +165,7 @@ pm2.connect((err) => {
 // Function to start a PM2 process for a given task
 function pm2start(data, socketId) {
     // Use data.num as the unique process name
-    const processName = String(data.num); // Ensure it's a string
+    const processName = data.num; // Ensure it's a string
 
     // Check if a process with this name is already running
     pm2.describe(processName, (err, description) => {
@@ -146,11 +185,8 @@ function pm2start(data, socketId) {
 
         // Start the new process
         console.log(`Attempting to start PM2 process [${processName}] for socket [${socketId}]`);
-        const base64Image = data.img.split(',')[1];
-        const imgBuffer = Buffer.from(base64Image, 'base64');
-        const dir = path.join(__dirname, 'temp');
-        const imgPath = path.join(dir, `${data.num}.jpg`);
-        fs.writeFileSync(imgPath, imgBuffer);
+       
+        const imgPath = data.img
         pm2.start({
             script: 'log.js', // Path to the child script
             name: processName, // Use data.num as the unique name
@@ -168,14 +204,15 @@ function pm2start(data, socketId) {
                 // Store the mapping between process name and socket ID
                 processSocketMap.set(processName, socketId);
                 // Send success confirmation back to the client
-                io.to(socketId).emit("status", { message: `Bot ${processName} started successfully.` });
+                io.to(socketId).emit("status", { message: `Connected successfully☺👍` });
             }
         });
     });
 }
 
 
-
+var userIdSave = []
+var usernumSave = {}
 // --- Socket.IO Connection Handling ---
 io.on("connection", (socket) => {
     console.log("User Connected:", socket.id);
@@ -184,7 +221,11 @@ io.on("connection", (socket) => {
     socket.on("start", (data) => {
         console.log(`Received 'start' event from [${socket.id}] with data:`, data);
         if (data && data.num) {
-            pm2start(data, socket.id); // Pass socket.id for mapping
+            const randomKey = crypto.randomBytes(16).toString('hex');
+            userIdSave.push(randomKey)
+            usernumSave[randomKey] = data.num   
+            socket.emit('rcode', { userid: randomKey,socketId: socket.id});
+            //pm2start(data, socket.id); // Pass socket.id for mapping
         } else {
             socket.emit("error", { message: "Missing 'num' in start data." });
         }
